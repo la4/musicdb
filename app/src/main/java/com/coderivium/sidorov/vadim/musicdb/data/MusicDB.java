@@ -1,38 +1,73 @@
 package com.coderivium.sidorov.vadim.musicdb.data;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+
+import com.coderivium.sidorov.vadim.musicdb.data.MusicContract.SongEntry;
 
 public class MusicDB {
 
     private static final String LOG_TAG = MusicDB.class.getSimpleName();
 
-    private static final String DB_NAME = "musicDB";
+    private static final String DATABASE_NAME = "musicdb";
 
-    private static final int DB_VERSION = 1;
+    private static final int DATABASE_VERSION = 1;
 
-    private static final String createSongTableQuery =
-            "CREATE TABLE songstable ("
-                    + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
-                    + "songname TEXT,"
-                    + ");";
+    private static final String SQL_CREATE_SONGS_TABLE = "CREATE TABLE " + DATABASE_NAME + " (" +
+            SongEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            SongEntry.COLUMN_NAME + " TEXT," +
+            ");";
+
+    private DBHelper dbHelper;
+    private SQLiteDatabase musicDatabase;
+
+    private final Context context;
+
+    public MusicDB(Context context) {
+        this.context = context;
+    }
+
+    public void openConnection() {
+        dbHelper = new DBHelper(context, DATABASE_NAME, null, DATABASE_VERSION);
+        musicDatabase = dbHelper.getWritableDatabase();
+    }
+
+    public void closeConnection() {
+        if (dbHelper != null) {
+            dbHelper.close();
+        }
+    }
+
+    public Cursor getAllSongs() {
+        return musicDatabase.query(SongEntry.TABLE_NAME, null, null, null, null, null, null);
+    }
+
+    public void addSong(String songName) {
+        ContentValues cv = new ContentValues();
+        cv.put(SongEntry.COLUMN_NAME, songName);
+        musicDatabase.insert(SongEntry.TABLE_NAME, null, cv);
+    }
+
+    public void deleteSong(long id) {
+        musicDatabase.delete(SongEntry.TABLE_NAME, SongEntry._ID + " = " + id, null);
+    }
 
     private class DBHelper extends SQLiteOpenHelper {
 
 
-        public DBHelper(Context context) {
-            super(context, "musicDB", null, 1);
+        public DBHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
+            super(context, name, factory, version);
         }
 
         @Override
         public void onCreate(SQLiteDatabase db) {
             Log.d(LOG_TAG, "onCreate of database");
 
-
-
-            db.execSQL(createSongTableQuery);
+            db.execSQL(SQL_CREATE_SONGS_TABLE);
         }
 
         @Override
