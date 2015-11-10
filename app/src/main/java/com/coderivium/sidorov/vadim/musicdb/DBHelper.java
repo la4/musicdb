@@ -10,17 +10,20 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final String LOG_TAG = DBHelper.class.getSimpleName();
 
     public DBHelper(Context context) {
-        super(context, "myDB", null, 1);
+        super(context, "musicDB", null, 1);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        Log.d(LOG_TAG, "--- onCreate database ---");
+        Log.d(LOG_TAG, "onCreate of database");
 
-        db.execSQL("create table mytable ("
-                + "id integer primary key autoincrement,"
-                + "name text,"
-                + "email text" + ");");
+        final String createSongTableQuery =
+                "CREATE TABLE songstable ("
+                        + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                        + "songname TEXT,"
+                        + ");";
+
+        db.execSQL(createSongTableQuery);
     }
 
     @Override
