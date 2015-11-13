@@ -1,24 +1,40 @@
 package com.coderivium.sidorov.vadim.musicdb;
 
+import android.content.Context;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
 
-public class SongFragment extends Fragment {
+import com.coderivium.sidorov.vadim.musicdb.data.MusicContract;
+import com.coderivium.sidorov.vadim.musicdb.data.MusicDBSingleton;
 
-    /**
-     * The fragment argument representing the section number for this
-     * fragment.
-     */
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
+
+public class SongFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+
     private static final String ARG_SECTION_NUMBER = "section_number";
+    private static final int CM_DELETE_ID = 1;
 
-    /**
-     * Returns a new instance of this fragment for the given section
-     * number.
-     */
+    private ListView songsList;
+
+    private SimpleCursorAdapter cursorAdapter;
+
+    private MusicDBSingleton musicDB;
+
+
     public static SongFragment newInstance(int sectionNumber) {
         SongFragment fragment = new SongFragment();
         Bundle args = new Bundle();
@@ -34,7 +50,91 @@ public class SongFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_song, container, false);
+
+
+        // Working with database
+        musicDB = MusicDBSingleton.getInstance();
+        musicDB.openConnection(getContext());
+
+        String[] from = new String[]{
+                MusicContract.SongEntry.COLUMN_NAME
+        };
+
+        int[] to = new int[] {
+                R.id.songName
+        };
+
+        cursorAdapter = new SimpleCursorAdapter(getContext(), R.layout.element_list, null, from, to, 0);
+        songsList = (ListView)rootView.findViewById(R.id.songsListView);
+        songsList.setAdapter(cursorAdapter);
+
+        // добавляем контекстное меню к списку
+        registerForContextMenu(songsList);
+
+        // создаем лоадер для чтения данных
+        getActivity().getSupportLoaderManager().initLoader(0, null, this);
+
         return rootView;
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        musicDB.closeConnection();
+    }
+
+    public void onCreateContextMenu(ContextMenu menu, View v,
+                                    ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        menu.add(0, CM_DELETE_ID, 0, R.string.delete_record);
+    }
+
+    public boolean onContextItemSelected(MenuItem item) {
+        if (item.getItemId() == CM_DELETE_ID) {
+            // получаем из пункта контекстного меню данные по пункту списка
+            AdapterView.AdapterContextMenuInfo acmi = (AdapterView.AdapterContextMenuInfo) item
+                    .getMenuInfo();
+            // извлекаем id записи и удаляем соответствующую запись в БД
+            musicDB.deleteSong(acmi.id);
+            // получаем новый курсор с данными
+            getActivity().getSupportLoaderManager().getLoader(0).forceLoad();
+            return true;
+        }
+        return super.onContextItemSelected(item);
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
+        return new MyCursorLoader(getContext(), musicDB);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        cursorAdapter.swapCursor(cursor);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+    }
+
+    static class MyCursorLoader extends CursorLoader {
+
+        MusicDBSingleton database;
+
+        public MyCursorLoader(Context context, MusicDBSingleton database) {
+            super(context);
+            this.database = database;
+        }
+
+        @Override
+        public Cursor loadInBackground() {
+            Cursor cursor = database.getAllSongs();
+            try {
+                TimeUnit.SECONDS.sleep(3);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return cursor;
+        }
+    }
 }

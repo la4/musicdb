@@ -9,29 +9,34 @@ import android.util.Log;
 
 import com.coderivium.sidorov.vadim.musicdb.data.MusicContract.SongEntry;
 
-public class MusicDB {
+public class MusicDBSingleton {
 
-    private static final String LOG_TAG = MusicDB.class.getSimpleName();
+    private static final String LOG_TAG = MusicDBSingleton.class.getSimpleName();
 
     private static final String DATABASE_NAME = "musicdb";
 
     private static final int DATABASE_VERSION = 1;
 
-    private static final String SQL_CREATE_SONGS_TABLE = "CREATE TABLE " + DATABASE_NAME + " (" +
+    private static final String SQL_CREATE_SONGS_TABLE = "CREATE TABLE " + SongEntry.TABLE_NAME + " (" +
             SongEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-            SongEntry.COLUMN_NAME + " TEXT," +
+            SongEntry.COLUMN_NAME + " TEXT" +
             ");";
 
     private DBHelper dbHelper;
+
     private SQLiteDatabase musicDatabase;
 
-    private final Context context;
+    private static MusicDBSingleton mInstance;
 
-    public MusicDB(Context context) {
-        this.context = context;
+    public static MusicDBSingleton getInstance() {
+        if (mInstance == null) {
+            mInstance = new MusicDBSingleton();
+        }
+
+        return mInstance;
     }
 
-    public void openConnection() {
+    public void openConnection(Context context) {
         dbHelper = new DBHelper(context, DATABASE_NAME, null, DATABASE_VERSION);
         musicDatabase = dbHelper.getWritableDatabase();
     }
