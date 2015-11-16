@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -22,6 +23,8 @@ import com.coderivium.sidorov.vadim.musicdb.data.MusicDB;
 import java.util.concurrent.TimeUnit;
 
 public class SongFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+
+    private static final String LOG_TAG = SongFragment.class.getSimpleName();
 
     private static final String ARG_SECTION_NUMBER = "section_number";
     private static final int CM_DELETE_ID = 1;
@@ -49,6 +52,8 @@ public class SongFragment extends Fragment implements LoaderManager.LoaderCallba
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_song, container, false);
 
+        Log.d(LOG_TAG, "onCreateView of fragment");
+
 
         // Working with database
         musicDB = MusicDB.getInstance();
@@ -61,18 +66,17 @@ public class SongFragment extends Fragment implements LoaderManager.LoaderCallba
                 R.id.songName
         };
 
+        // Setting adapter
         cursorAdapter = new SimpleCursorAdapter(getContext(), R.layout.element_list, null, from, to, 0);
         songsList = (ListView)rootView.findViewById(R.id.songsListView);
         songsList.setAdapter(cursorAdapter);
 
-        // добавляем контекстное меню к списку
         registerForContextMenu(songsList);
 
-        // создаем лоадер для чтения данных
         getActivity().getSupportLoaderManager().initLoader(0, null, this);
-
         return rootView;
     }
+
 
     public void onCreateContextMenu(ContextMenu menu, View v,
                                     ContextMenu.ContextMenuInfo menuInfo) {
@@ -96,11 +100,13 @@ public class SongFragment extends Fragment implements LoaderManager.LoaderCallba
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
+        Log.d(LOG_TAG, "onCreateLoader");
         return new MyCursorLoader(getContext(), musicDB);
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        Log.d(LOG_TAG, "onLoadFinished");
         cursorAdapter.swapCursor(cursor);
     }
 
@@ -115,16 +121,15 @@ public class SongFragment extends Fragment implements LoaderManager.LoaderCallba
         public MyCursorLoader(Context context, MusicDB database) {
             super(context);
             this.database = database;
+            Log.d(LOG_TAG, "MyCursorLoader constructor");
         }
 
         @Override
         public Cursor loadInBackground() {
+
+            Log.d(LOG_TAG, "loadInBackground of MyCursorLoader");
+
             Cursor cursor = database.getAllSongs();
-            try {
-                TimeUnit.SECONDS.sleep(3);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
             return cursor;
         }
     }

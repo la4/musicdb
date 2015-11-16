@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,6 +29,8 @@ public class MainActivity extends AppCompatActivity {
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
 
+    private final static String LOG_TAG = MainActivity.class.getSimpleName();
+
     private SectionsPagerAdapter mSectionsPagerAdapter;
 
     private MusicDB musicDB;
@@ -38,6 +41,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Log.d(LOG_TAG, "onCreate activity");
+
 
         // Working with database
         musicDB = MusicDB.getInstance();
@@ -99,15 +104,26 @@ public class MainActivity extends AppCompatActivity {
      */
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
+        private final String LOG_TAG = SectionsPagerAdapter.class.getSimpleName();
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
         }
 
         @Override
         public Fragment getItem(int position) {
+            Log.d(LOG_TAG, "MyCursorLoader constructor");
             // getItem is called to instantiate the fragment for the given page.
-            // Return a PlaceholderFragment (defined as a static inner class below).
-            return SongFragment.newInstance(position + 1);
+
+            switch (position) {
+                case 0:
+                    return SongFragment.newInstance(position + 1);
+                case 1:
+                    return BlankFragment.newInstance("default", "default");
+                case 2:
+                    return BlankFragment.newInstance("default", "default");
+                default:
+                    return BlankFragment.newInstance("default", "default");
+            }
         }
 
         @Override
