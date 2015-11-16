@@ -9,9 +9,9 @@ import android.util.Log;
 
 import com.coderivium.sidorov.vadim.musicdb.data.MusicContract.SongEntry;
 
-public class MusicDBSingleton {
+public class MusicDB {
 
-    private static final String LOG_TAG = MusicDBSingleton.class.getSimpleName();
+    private static final String LOG_TAG = MusicDB.class.getSimpleName();
 
     private static final String DATABASE_NAME = "musicdb";
 
@@ -26,14 +26,18 @@ public class MusicDBSingleton {
 
     private SQLiteDatabase musicDatabase;
 
-    private static MusicDBSingleton mInstance;
+    private static MusicDB mInstance;
 
-    public static MusicDBSingleton getInstance() {
+    public static MusicDB getInstance() {
         if (mInstance == null) {
-            mInstance = new MusicDBSingleton();
+            mInstance = new MusicDB();
         }
 
         return mInstance;
+    }
+
+    private MusicDB() {
+
     }
 
     public void openConnection(Context context) {

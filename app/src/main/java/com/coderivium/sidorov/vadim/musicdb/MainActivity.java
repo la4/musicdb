@@ -13,7 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.coderivium.sidorov.vadim.musicdb.data.MusicDBSingleton;
+import com.coderivium.sidorov.vadim.musicdb.data.MusicDB;
 
 import java.util.Random;
 
@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
 
     private SectionsPagerAdapter mSectionsPagerAdapter;
 
-    private MusicDBSingleton musicDB;
+    private MusicDB musicDB;
 
     private ViewPager mViewPager;
 
@@ -39,7 +39,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        musicDB = MusicDBSingleton.getInstance();
+        // Working with database
+        musicDB = MusicDB.getInstance();
+        musicDB.openConnection(this);
+
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -82,6 +85,12 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        musicDB.closeConnection();
     }
 
     /**

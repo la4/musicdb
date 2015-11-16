@@ -3,7 +3,6 @@ package com.coderivium.sidorov.vadim.musicdb;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -18,9 +17,8 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
 import com.coderivium.sidorov.vadim.musicdb.data.MusicContract;
-import com.coderivium.sidorov.vadim.musicdb.data.MusicDBSingleton;
+import com.coderivium.sidorov.vadim.musicdb.data.MusicDB;
 
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 public class SongFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -32,7 +30,7 @@ public class SongFragment extends Fragment implements LoaderManager.LoaderCallba
 
     private SimpleCursorAdapter cursorAdapter;
 
-    private MusicDBSingleton musicDB;
+    private MusicDB musicDB;
 
 
     public static SongFragment newInstance(int sectionNumber) {
@@ -53,8 +51,7 @@ public class SongFragment extends Fragment implements LoaderManager.LoaderCallba
 
 
         // Working with database
-        musicDB = MusicDBSingleton.getInstance();
-        musicDB.openConnection(getContext());
+        musicDB = MusicDB.getInstance();
 
         String[] from = new String[]{
                 MusicContract.SongEntry.COLUMN_NAME
@@ -75,12 +72,6 @@ public class SongFragment extends Fragment implements LoaderManager.LoaderCallba
         getActivity().getSupportLoaderManager().initLoader(0, null, this);
 
         return rootView;
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        musicDB.closeConnection();
     }
 
     public void onCreateContextMenu(ContextMenu menu, View v,
@@ -119,9 +110,9 @@ public class SongFragment extends Fragment implements LoaderManager.LoaderCallba
 
     static class MyCursorLoader extends CursorLoader {
 
-        MusicDBSingleton database;
+        MusicDB database;
 
-        public MyCursorLoader(Context context, MusicDBSingleton database) {
+        public MyCursorLoader(Context context, MusicDB database) {
             super(context);
             this.database = database;
         }
