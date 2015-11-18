@@ -2,9 +2,13 @@
     <string name="app_name">MusicDB</string>
     <string name="action_settings">Settings</string>
     <string name="section_format">Hello World from section: %1$d</string>
-    <string name="add_record">Add record</string>
     <string name="delete_record">Delete record</string>
 
-<!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="add_dialog_title">Add song</string>
+    <string name="add_dialog_cancel">Cancel</string>
+    <string name="add_dialog_proceed">Add</string>
+    <string name="add_dialog_song_name">Song name</string>
+    <string name="add_dialog_album_name">Album name</string>
+    <string name="add_dialog_artist_name">Artist name</string>
 </resources>
