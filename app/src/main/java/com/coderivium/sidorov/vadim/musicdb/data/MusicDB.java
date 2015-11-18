@@ -7,25 +7,36 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import com.coderivium.sidorov.vadim.musicdb.data.MusicContract.SongEntry;
+import com.coderivium.sidorov.vadim.musicdb.data.MusicContract.*;
 
 public class MusicDB {
 
     private static final String LOG_TAG = MusicDB.class.getSimpleName();
 
     private static final String DATABASE_NAME = "musicdb";
-
     private static final int DATABASE_VERSION = 1;
 
     private static final String SQL_CREATE_SONGS_TABLE = "CREATE TABLE " + SongEntry.TABLE_NAME + " (" +
             SongEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-            SongEntry.COLUMN_NAME + " TEXT" +
+            SongEntry.COLUMN_NAME + " TEXT, " +
+            SongEntry.COLUMN_ALBUM + " TEXT, " +
+            "FOREIGN KEY (" + SongEntry.COLUMN_ALBUM + ") REFERENCES " + AlbumEntry.TABLE_NAME + " (" + AlbumEntry._ID + ") ON DELETE CASCADE" +
+            ");";
+
+    private static final String SQL_CREATE_ALBUMS_TABLE = "CREATE TABLE " + AlbumEntry.TABLE_NAME + " (" +
+            AlbumEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            AlbumEntry.COLUMN_NAME + " TEXT UNIQUE, " +
+            AlbumEntry.COLUMN_ARTIST + " TEXT, " +
+            "FOREIGN KEY (" + AlbumEntry.COLUMN_ARTIST + ") REFERENCES " + ArtistEntry.TABLE_NAME + " (" + ArtistEntry._ID+ ") ON DELETE CASCADE" +
+            ");";
+
+    private static final String SQL_CREATE_ARTISTS_TABLE = "CREATE TABLE " + ArtistEntry.TABLE_NAME + " (" +
+            ArtistEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            ArtistEntry.COLUMN_NAME + " TEXT UNIQUE" +
             ");";
 
     private DBHelper dbHelper;
-
     private SQLiteDatabase musicDatabase;
-
     private static MusicDB mInstance;
 
     public static MusicDB getInstance() {
@@ -65,6 +76,22 @@ public class MusicDB {
         musicDatabase.delete(SongEntry.TABLE_NAME, SongEntry._ID + " = " + id, null);
     }
 
+    public Cursor getAllAlbums() {
+        return musicDatabase.query(AlbumEntry.TABLE_NAME, null, null, null, null, null, null);
+    }
+
+    public void deleteAlbum(long id) {
+        musicDatabase.delete(AlbumEntry.TABLE_NAME, AlbumEntry._ID + " = " + id, null);
+    }
+
+    public Cursor getAllArtists() {
+        return musicDatabase.query(ArtistEntry.TABLE_NAME, null, null, null, null, null, null);
+    }
+
+    public void deleteArtist(long id) {
+        musicDatabase.delete(ArtistEntry.TABLE_NAME, ArtistEntry._ID + " = " + id, null);
+    }
+
     private class DBHelper extends SQLiteOpenHelper {
 
 
@@ -74,9 +101,9 @@ public class MusicDB {
 
         @Override
         public void onCreate(SQLiteDatabase db) {
-            Log.d(LOG_TAG, "onCreate of database");
-
             db.execSQL(SQL_CREATE_SONGS_TABLE);
+            db.execSQL(SQL_CREATE_ALBUMS_TABLE);
+            db.execSQL(SQL_CREATE_ARTISTS_TABLE);
         }
 
         @Override
