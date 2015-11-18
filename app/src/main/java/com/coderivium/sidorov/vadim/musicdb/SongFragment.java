@@ -20,13 +20,10 @@ import android.widget.SimpleCursorAdapter;
 import com.coderivium.sidorov.vadim.musicdb.data.MusicContract;
 import com.coderivium.sidorov.vadim.musicdb.data.MusicDB;
 
-import java.util.concurrent.TimeUnit;
-
 public class SongFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String LOG_TAG = SongFragment.class.getSimpleName();
 
-    private static final String ARG_SECTION_NUMBER = "section_number";
     private static final int CM_DELETE_ID = 1;
 
     private ListView songsList;
@@ -36,11 +33,9 @@ public class SongFragment extends Fragment implements LoaderManager.LoaderCallba
     private MusicDB musicDB;
 
 
-    public static SongFragment newInstance(int sectionNumber) {
+    public static SongFragment newInstance() {
         SongFragment fragment = new SongFragment();
-        Bundle args = new Bundle();
-        args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-        fragment.setArguments(args);
+        // Could've put arguments here
         return fragment;
     }
 
@@ -50,10 +45,7 @@ public class SongFragment extends Fragment implements LoaderManager.LoaderCallba
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_song, container, false);
-
-        Log.d(LOG_TAG, "onCreateView of fragment");
-
+        View rootView = inflater.inflate(R.layout.fragment_songs, container, false);
 
         // Working with database
         musicDB = MusicDB.getInstance();
@@ -67,7 +59,7 @@ public class SongFragment extends Fragment implements LoaderManager.LoaderCallba
         };
 
         // Setting adapter
-        cursorAdapter = new SimpleCursorAdapter(getContext(), R.layout.element_list, null, from, to, 0);
+        cursorAdapter = new SimpleCursorAdapter(getContext(), R.layout.element_list_song, null, from, to, 0);
         songsList = (ListView)rootView.findViewById(R.id.songsListView);
         songsList.setAdapter(cursorAdapter);
 
@@ -100,13 +92,11 @@ public class SongFragment extends Fragment implements LoaderManager.LoaderCallba
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
-        Log.d(LOG_TAG, "onCreateLoader");
         return new MyCursorLoader(getContext(), musicDB);
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        Log.d(LOG_TAG, "onLoadFinished");
         cursorAdapter.swapCursor(cursor);
     }
 
@@ -121,13 +111,10 @@ public class SongFragment extends Fragment implements LoaderManager.LoaderCallba
         public MyCursorLoader(Context context, MusicDB database) {
             super(context);
             this.database = database;
-            Log.d(LOG_TAG, "MyCursorLoader constructor");
         }
 
         @Override
         public Cursor loadInBackground() {
-
-            Log.d(LOG_TAG, "loadInBackground of MyCursorLoader");
 
             Cursor cursor = database.getAllSongs();
             return cursor;
