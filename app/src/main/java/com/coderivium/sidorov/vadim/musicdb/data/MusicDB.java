@@ -66,10 +66,41 @@ public class MusicDB {
         return musicDatabase.query(SongEntry.TABLE_NAME, null, null, null, null, null, null);
     }
 
-    public void addSong(String songName) {
-        ContentValues cv = new ContentValues();
-        cv.put(SongEntry.COLUMN_NAME, songName);
-        musicDatabase.insert(SongEntry.TABLE_NAME, null, cv);
+    public void addSong(String songName, String albumName, String artistName) {
+        ContentValues songCV = new ContentValues();
+        songCV.put(SongEntry.COLUMN_NAME, songName);
+
+        Log.d("", musicDatabase.getPath());
+
+        String [] selectionArgs = new String[] { artistName };
+        Cursor artistCursor = musicDatabase.query(ArtistEntry.TABLE_NAME, null, ArtistEntry.COLUMN_NAME + " LIKE ?",  selectionArgs, null, null, null);
+
+        if (artistCursor.getCount() <= 0) {
+            ContentValues artistCV = new ContentValues();
+
+            // Adding artist
+            artistCV.put(ArtistEntry.COLUMN_NAME, artistName);
+            long rowId = musicDatabase.insert(ArtistEntry.TABLE_NAME, null, artistCV);
+            artistCursor = musicDatabase.query(ArtistEntry.TABLE_NAME, null, ArtistEntry.COLUMN_NAME + " LIKE ?",  selectionArgs, null, null, null);
+        }
+
+        selectionArgs = new String[] { albumName};
+        Cursor albumCursor = musicDatabase.query(AlbumEntry.TABLE_NAME, null, AlbumEntry.COLUMN_NAME + " = ?", selectionArgs, null, null, null);
+
+        if (albumCursor.getCount() <= 0) {
+            ContentValues albumCV = new ContentValues();
+
+
+            albumCV.put(AlbumEntry.COLUMN_NAME, albumName);
+            albumCV.put(AlbumEntry.COLUMN_ARTIST, artistCursor.getInt(artistCursor.getColumnIndex(ArtistEntry._ID)));
+
+            musicDatabase.insert(AlbumEntry.TABLE_NAME, null, songCV);
+            albumCursor = musicDatabase.query(AlbumEntry.TABLE_NAME, null, AlbumEntry.COLUMN_NAME + " = ?", selectionArgs, null, null, null);
+        }
+
+        songCV.put(SongEntry.COLUMN_ALBUM, albumCursor.getInt(albumCursor.getColumnIndex(AlbumEntry._ID)));
+
+        musicDatabase.insert(SongEntry.TABLE_NAME, null, songCV);
     }
 
     public void deleteSong(long id) {

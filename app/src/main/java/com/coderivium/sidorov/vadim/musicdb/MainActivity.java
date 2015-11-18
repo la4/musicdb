@@ -1,6 +1,8 @@
 package com.coderivium.sidorov.vadim.musicdb;
 
+import android.content.DialogInterface;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -10,13 +12,14 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 
 import com.coderivium.sidorov.vadim.musicdb.data.MusicDB;
-
-import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -37,12 +40,12 @@ public class MainActivity extends AppCompatActivity {
 
     private ViewPager mViewPager;
 
+    private LinearLayout linearLayout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Log.d(LOG_TAG, "onCreate activity");
-
 
         // Working with database
         musicDB = MusicDB.getInstance();
@@ -63,9 +66,35 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                LayoutInflater inflater = getLayoutInflater();
+                linearLayout = (LinearLayout) inflater.inflate(R.layout.element_dialog_edittexts, null, false);
 
-                musicDB.addSong("Test Song " + (new Random().nextInt()));
-                getSupportLoaderManager().getLoader(0).forceLoad();
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+
+                builder.setCancelable(true)
+                        .setView(linearLayout)
+                        .setNegativeButton(R.string.add_dialog_cancel,
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        dialog.cancel();
+                                    }
+                                })
+                        .setPositiveButton(R.string.add_dialog_proceed,
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        musicDB.addSong(
+                                                ((EditText) linearLayout.findViewById(R.id.songName)).getText().toString(),
+                                                ((EditText) linearLayout.findViewById(R.id.albumName)).getText().toString(),
+                                                ((EditText) linearLayout.findViewById(R.id.artistName)).getText().toString());
+
+                                        getSupportLoaderManager().getLoader(0).forceLoad();
+                                        getSupportLoaderManager().getLoader(1).forceLoad();
+                                        getSupportLoaderManager().getLoader(2).forceLoad();
+                                    }
+                                });
+
+                AlertDialog alert = builder.create();
+                alert.show();
             }
         });
     }
