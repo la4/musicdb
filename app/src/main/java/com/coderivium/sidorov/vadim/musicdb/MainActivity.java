@@ -111,19 +111,17 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public Fragment getItem(int position) {
-            Log.d(LOG_TAG, "MyCursorLoader constructor");
             // getItem is called to instantiate the fragment for the given page.
 
             switch (position) {
                 case 0:
-                    return SongFragment.newInstance(position + 1);
+                    return SongFragment.newInstance();
                 case 1:
-                    return BlankFragment.newInstance("default", "default");
+                    return AlbumsFragment.newInstance();
                 case 2:
-                    return BlankFragment.newInstance("default", "default");
-                default:
-                    return BlankFragment.newInstance("default", "default");
+                    return ArtistsFragment.newInstance();
             }
+            return SongFragment.newInstance();
         }
 
         @Override
@@ -136,11 +134,11 @@ public class MainActivity extends AppCompatActivity {
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return "SECTION 1";
+                    return "SONGS";
                 case 1:
-                    return "SECTION 2";
+                    return "ALBUMS";
                 case 2:
-                    return "SECTION 3";
+                    return "ARTISTS";
             }
             return null;
         }
