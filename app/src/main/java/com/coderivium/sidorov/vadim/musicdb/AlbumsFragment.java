@@ -27,7 +27,7 @@ import com.coderivium.sidorov.vadim.musicdb.data.MusicDB;
  * Use the {@link AlbumsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class AlbumsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
+public class AlbumsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     public static final String LOG_TAG = AlbumsFragment.class.getSimpleName();
 
@@ -60,37 +60,50 @@ public class AlbumsFragment extends Fragment implements LoaderManager.LoaderCall
                 MusicContract.AlbumEntry.COLUMN_NAME
         };
 
-        int[] to = new int[] {
+        int[] to = new int[]{
                 R.id.albumName
         };
 
         // Setting adapter
         cursorAdapter = new SimpleCursorAdapter(getContext(), R.layout.element_list_album, null, from, to, 0);
-        albumsList = (ListView)rootView.findViewById(R.id.albumsListView);
+        albumsList = (ListView) rootView.findViewById(R.id.albumsListView);
         albumsList.setAdapter(cursorAdapter);
-
-        registerForContextMenu(albumsList);
 
         getActivity().getSupportLoaderManager().initLoader(1, null, this);
         return rootView;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        registerForContextMenu(albumsList);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        unregisterForContextMenu(albumsList);
+    }
 
     public void onCreateContextMenu(ContextMenu menu, View v,
                                     ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-        menu.add(0, CM_DELETE_ID, 0, R.string.delete_record);
+        menu.add(0, CM_DELETE_ID, 0, R.string.delete_album);
     }
 
     public boolean onContextItemSelected(MenuItem item) {
-        if (item.getItemId() == CM_DELETE_ID) {
-            // получаем из пункта контекстного меню данные по пункту списка
+        if (getUserVisibleHint() && item.getItemId() == CM_DELETE_ID) {
             AdapterView.AdapterContextMenuInfo acmi = (AdapterView.AdapterContextMenuInfo) item
                     .getMenuInfo();
-            // извлекаем id записи и удаляем соответствующую запись в БД
             musicDB.deleteAlbum(acmi.id);
-            // получаем новый курсор с данными
-            getActivity().getSupportLoaderManager().getLoader(0).forceLoad();
+
+            // Updating cursors/listviews
+            if (getActivity().getSupportLoaderManager().getLoader(0) != null) {
+                getActivity().getSupportLoaderManager().getLoader(0).forceLoad();
+            }
+            if (getActivity().getSupportLoaderManager().getLoader(1) != null) {
+                getActivity().getSupportLoaderManager().getLoader(1).forceLoad();
+            }
             return true;
         }
         return super.onContextItemSelected(item);

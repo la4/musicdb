@@ -87,9 +87,15 @@ public class MainActivity extends AppCompatActivity {
                                                 ((EditText) linearLayout.findViewById(R.id.albumName)).getText().toString(),
                                                 ((EditText) linearLayout.findViewById(R.id.artistName)).getText().toString());
 
-                                        getSupportLoaderManager().getLoader(0).forceLoad();
-                                        getSupportLoaderManager().getLoader(1).forceLoad();
-                                        getSupportLoaderManager().getLoader(2).forceLoad();
+                                        if (getSupportLoaderManager().getLoader(0) != null) {
+                                            getSupportLoaderManager().getLoader(0).forceLoad();
+                                        }
+                                        if (getSupportLoaderManager().getLoader(1) != null) {
+                                            getSupportLoaderManager().getLoader(1).forceLoad();
+                                        }
+                                        if (getSupportLoaderManager().getLoader(2) != null) {
+                                            getSupportLoaderManager().getLoader(2).forceLoad();
+                                        }
                                     }
                                 });
 

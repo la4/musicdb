@@ -54,37 +54,49 @@ public class SongFragment extends Fragment implements LoaderManager.LoaderCallba
                 MusicContract.SongEntry.COLUMN_NAME
         };
 
-        int[] to = new int[] {
+        int[] to = new int[]{
                 R.id.songName
         };
 
         // Setting adapter
         cursorAdapter = new SimpleCursorAdapter(getContext(), R.layout.element_list_song, null, from, to, 0);
-        songsList = (ListView)rootView.findViewById(R.id.songsListView);
+        songsList = (ListView) rootView.findViewById(R.id.songsListView);
         songsList.setAdapter(cursorAdapter);
 
-        registerForContextMenu(songsList);
 
         getActivity().getSupportLoaderManager().initLoader(0, null, this);
         return rootView;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        registerForContextMenu(songsList);
+    }
+
+    @Override
+    public void onPause() {
+        unregisterForContextMenu(songsList);
+        super.onPause();
+    }
 
     public void onCreateContextMenu(ContextMenu menu, View v,
                                     ContextMenu.ContextMenuInfo menuInfo) {
+
         super.onCreateContextMenu(menu, v, menuInfo);
-        menu.add(0, CM_DELETE_ID, 0, R.string.delete_record);
+        menu.add(0, CM_DELETE_ID, 0, R.string.delete_song);
     }
 
     public boolean onContextItemSelected(MenuItem item) {
-        if (item.getItemId() == CM_DELETE_ID) {
-            // получаем из пункта контекстного меню данные по пункту списка
+        if (getUserVisibleHint() && item.getItemId() == CM_DELETE_ID) {
             AdapterView.AdapterContextMenuInfo acmi = (AdapterView.AdapterContextMenuInfo) item
                     .getMenuInfo();
-            // извлекаем id записи и удаляем соответствующую запись в БД
             musicDB.deleteSong(acmi.id);
-            // получаем новый курсор с данными
-            getActivity().getSupportLoaderManager().getLoader(0).forceLoad();
+
+            // Updating cursors/listviews
+            if (getActivity().getSupportLoaderManager().getLoader(0) != null) {
+                getActivity().getSupportLoaderManager().getLoader(0).forceLoad();
+            }
             return true;
         }
         return super.onContextItemSelected(item);

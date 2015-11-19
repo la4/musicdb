@@ -73,7 +73,8 @@ public class MusicDB {
         Log.d("", musicDatabase.getPath());
 
         String [] selectionArgs = new String[] { artistName };
-        Cursor artistCursor = musicDatabase.query(ArtistEntry.TABLE_NAME, null, ArtistEntry.COLUMN_NAME + " LIKE ?",  selectionArgs, null, null, null);
+        Cursor artistCursor = musicDatabase.query(ArtistEntry.TABLE_NAME, null, ArtistEntry.COLUMN_NAME + " = ?",  selectionArgs, null, null, null);
+        artistCursor.moveToFirst();
 
         if (artistCursor.getCount() <= 0) {
             ContentValues artistCV = new ContentValues();
@@ -81,11 +82,13 @@ public class MusicDB {
             // Adding artist
             artistCV.put(ArtistEntry.COLUMN_NAME, artistName);
             long rowId = musicDatabase.insert(ArtistEntry.TABLE_NAME, null, artistCV);
-            artistCursor = musicDatabase.query(ArtistEntry.TABLE_NAME, null, ArtistEntry.COLUMN_NAME + " LIKE ?",  selectionArgs, null, null, null);
+            artistCursor = musicDatabase.query(ArtistEntry.TABLE_NAME, null, ArtistEntry.COLUMN_NAME + " = ?",  selectionArgs, null, null, null);
+            artistCursor.moveToFirst();
         }
 
-        selectionArgs = new String[] { albumName};
+        selectionArgs = new String[] { albumName };
         Cursor albumCursor = musicDatabase.query(AlbumEntry.TABLE_NAME, null, AlbumEntry.COLUMN_NAME + " = ?", selectionArgs, null, null, null);
+        albumCursor.moveToFirst();
 
         if (albumCursor.getCount() <= 0) {
             ContentValues albumCV = new ContentValues();
@@ -94,8 +97,9 @@ public class MusicDB {
             albumCV.put(AlbumEntry.COLUMN_NAME, albumName);
             albumCV.put(AlbumEntry.COLUMN_ARTIST, artistCursor.getInt(artistCursor.getColumnIndex(ArtistEntry._ID)));
 
-            musicDatabase.insert(AlbumEntry.TABLE_NAME, null, songCV);
+            musicDatabase.insert(AlbumEntry.TABLE_NAME, null, albumCV);
             albumCursor = musicDatabase.query(AlbumEntry.TABLE_NAME, null, AlbumEntry.COLUMN_NAME + " = ?", selectionArgs, null, null, null);
+            albumCursor.moveToFirst();
         }
 
         songCV.put(SongEntry.COLUMN_ALBUM, albumCursor.getInt(albumCursor.getColumnIndex(AlbumEntry._ID)));
@@ -104,7 +108,8 @@ public class MusicDB {
     }
 
     public void deleteSong(long id) {
-        musicDatabase.delete(SongEntry.TABLE_NAME, SongEntry._ID + " = " + id, null);
+        String []whereArgs = new String [] { String.valueOf(id) };
+        musicDatabase.delete(SongEntry.TABLE_NAME, SongEntry._ID + " = ?", whereArgs);
     }
 
     public Cursor getAllAlbums() {
@@ -120,7 +125,7 @@ public class MusicDB {
     }
 
     public void deleteArtist(long id) {
-        musicDatabase.delete(ArtistEntry.TABLE_NAME, ArtistEntry._ID + " = " + id, null);
+        Log.d(LOG_TAG, musicDatabase.delete(ArtistEntry.TABLE_NAME, ArtistEntry._ID + " = " + id, null) + "");
     }
 
     private class DBHelper extends SQLiteOpenHelper {

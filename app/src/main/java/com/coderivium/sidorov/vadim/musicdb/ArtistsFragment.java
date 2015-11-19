@@ -20,7 +20,7 @@ import com.coderivium.sidorov.vadim.musicdb.data.MusicContract;
 import com.coderivium.sidorov.vadim.musicdb.data.MusicDB;
 
 
-public class ArtistsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
+public class ArtistsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     public static final String LOG_TAG = ArtistsFragment.class.getSimpleName();
 
@@ -54,37 +54,54 @@ public class ArtistsFragment extends Fragment implements LoaderManager.LoaderCal
                 MusicContract.ArtistEntry.COLUMN_NAME
         };
 
-        int[] to = new int[] {
+        int[] to = new int[]{
                 R.id.artistName
         };
 
         // Setting adapter
         cursorAdapter = new SimpleCursorAdapter(getContext(), R.layout.element_list_artist, null, from, to, 0);
-        artistsList = (ListView)rootView.findViewById(R.id.artistsListView);
+        artistsList = (ListView) rootView.findViewById(R.id.artistsListView);
         artistsList.setAdapter(cursorAdapter);
 
-        registerForContextMenu(artistsList);
 
         getActivity().getSupportLoaderManager().initLoader(2, null, this);
         return rootView;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        registerForContextMenu(artistsList);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        unregisterForContextMenu(artistsList);
+    }
 
     public void onCreateContextMenu(ContextMenu menu, View v,
                                     ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-        menu.add(0, CM_DELETE_ID, 0, R.string.delete_record);
+        menu.add(0, CM_DELETE_ID, 0, R.string.delete_artist);
     }
 
     public boolean onContextItemSelected(MenuItem item) {
-        if (item.getItemId() == CM_DELETE_ID) {
-            // получаем из пункта контекстного меню данные по пункту списка
+        if (getUserVisibleHint() && item.getItemId() == CM_DELETE_ID) {
             AdapterView.AdapterContextMenuInfo acmi = (AdapterView.AdapterContextMenuInfo) item
                     .getMenuInfo();
-            // извлекаем id записи и удаляем соответствующую запись в БД
             musicDB.deleteArtist(acmi.id);
-            // получаем новый курсор с данными
-            getActivity().getSupportLoaderManager().getLoader(0).forceLoad();
+
+            // Updating cursors/listviews
+            if (getActivity().getSupportLoaderManager().getLoader(0) != null) {
+                getActivity().getSupportLoaderManager().getLoader(0).forceLoad();
+            }
+            if (getActivity().getSupportLoaderManager().getLoader(1) != null) {
+                getActivity().getSupportLoaderManager().getLoader(1).forceLoad();
+            }
+            if (getActivity().getSupportLoaderManager().getLoader(2) != null) {
+                getActivity().getSupportLoaderManager().getLoader(2).forceLoad();
+            }
             return true;
         }
         return super.onContextItemSelected(item);
