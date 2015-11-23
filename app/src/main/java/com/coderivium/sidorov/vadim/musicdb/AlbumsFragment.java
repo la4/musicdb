@@ -27,18 +27,11 @@ import com.coderivium.sidorov.vadim.musicdb.data.MusicDB;
  * Use the {@link AlbumsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class AlbumsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class AlbumsFragment extends BaseFragment {
 
-    public static final String LOG_TAG = AlbumsFragment.class.getSimpleName();
-
-    private static final int CM_DELETE_ID = 1;
+    private static final String LOG_TAG = AlbumsFragment.class.getSimpleName();
 
     private ListView albumsList;
-
-    private SimpleCursorAdapter cursorAdapter;
-
-    private MusicDB musicDB;
-
 
     public static AlbumsFragment newInstance() {
         AlbumsFragment fragment = new AlbumsFragment();
@@ -69,7 +62,7 @@ public class AlbumsFragment extends Fragment implements LoaderManager.LoaderCall
         albumsList = (ListView) rootView.findViewById(R.id.albumsListView);
         albumsList.setAdapter(cursorAdapter);
 
-        getActivity().getSupportLoaderManager().initLoader(1, null, this);
+        getActivity().getSupportLoaderManager().initLoader(Constants.ALBUMS_LOADER_ID, null, this);
         return rootView;
     }
 
@@ -85,33 +78,18 @@ public class AlbumsFragment extends Fragment implements LoaderManager.LoaderCall
         unregisterForContextMenu(albumsList);
     }
 
-    public void onCreateContextMenu(ContextMenu menu, View v,
-                                    ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        menu.add(0, CM_DELETE_ID, 0, R.string.delete_album);
-    }
+    @Override
+    protected void deleteRecord(long id) {
+        musicDB.deleteAlbum(id);
 
-    public boolean onContextItemSelected(MenuItem item) {
-        if (getUserVisibleHint() && item.getItemId() == CM_DELETE_ID) {
-            AdapterView.AdapterContextMenuInfo acmi = (AdapterView.AdapterContextMenuInfo) item
-                    .getMenuInfo();
-            musicDB.deleteAlbum(acmi.id);
-
-            // Updating cursors/listviews
-            if (getActivity().getSupportLoaderManager().getLoader(0) != null) {
-                getActivity().getSupportLoaderManager().getLoader(0).forceLoad();
-            }
-            if (getActivity().getSupportLoaderManager().getLoader(1) != null) {
-                getActivity().getSupportLoaderManager().getLoader(1).forceLoad();
-            }
-            return true;
-        }
-        return super.onContextItemSelected(item);
+        // Updating loaders/listviews
+        updateLoader(Constants.SONGS_LOADER_ID);
+        updateLoader(Constants.ALBUMS_LOADER_ID);
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
-        return new AlbumsCursor(getContext(), musicDB);
+        return new AlbumsCursorLoader(getContext(), musicDB);
     }
 
     @Override
@@ -123,11 +101,11 @@ public class AlbumsFragment extends Fragment implements LoaderManager.LoaderCall
     public void onLoaderReset(Loader<Cursor> loader) {
     }
 
-    static class AlbumsCursor extends CursorLoader {
+    static class AlbumsCursorLoader extends CursorLoader {
 
         MusicDB database;
 
-        public AlbumsCursor(Context context, MusicDB database) {
+        public AlbumsCursorLoader(Context context, MusicDB database) {
             super(context);
             this.database = database;
         }

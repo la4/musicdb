@@ -7,7 +7,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -20,22 +19,14 @@ import android.widget.SimpleCursorAdapter;
 import com.coderivium.sidorov.vadim.musicdb.data.MusicContract;
 import com.coderivium.sidorov.vadim.musicdb.data.MusicDB;
 
-public class SongFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class SongFragment extends BaseFragment {
 
     private static final String LOG_TAG = SongFragment.class.getSimpleName();
 
-    private static final int CM_DELETE_ID = 1;
-
     private ListView songsList;
-
-    private SimpleCursorAdapter cursorAdapter;
-
-    private MusicDB musicDB;
-
 
     public static SongFragment newInstance() {
         SongFragment fragment = new SongFragment();
-        // Could've put arguments here
         return fragment;
     }
 
@@ -64,7 +55,7 @@ public class SongFragment extends Fragment implements LoaderManager.LoaderCallba
         songsList.setAdapter(cursorAdapter);
 
 
-        getActivity().getSupportLoaderManager().initLoader(0, null, this);
+        getActivity().getSupportLoaderManager().initLoader(Constants.SONGS_LOADER_ID, null, this);
         return rootView;
     }
 
@@ -80,31 +71,17 @@ public class SongFragment extends Fragment implements LoaderManager.LoaderCallba
         super.onPause();
     }
 
-    public void onCreateContextMenu(ContextMenu menu, View v,
-                                    ContextMenu.ContextMenuInfo menuInfo) {
+    @Override
+    protected void deleteRecord(long id) {
+        musicDB.deleteSong(id);
 
-        super.onCreateContextMenu(menu, v, menuInfo);
-        menu.add(0, CM_DELETE_ID, 0, R.string.delete_song);
-    }
-
-    public boolean onContextItemSelected(MenuItem item) {
-        if (getUserVisibleHint() && item.getItemId() == CM_DELETE_ID) {
-            AdapterView.AdapterContextMenuInfo acmi = (AdapterView.AdapterContextMenuInfo) item
-                    .getMenuInfo();
-            musicDB.deleteSong(acmi.id);
-
-            // Updating cursors/listviews
-            if (getActivity().getSupportLoaderManager().getLoader(0) != null) {
-                getActivity().getSupportLoaderManager().getLoader(0).forceLoad();
-            }
-            return true;
-        }
-        return super.onContextItemSelected(item);
+        // Updating loaders/listviews
+        updateLoader(Constants.SONGS_LOADER_ID);
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
-        return new MyCursorLoader(getContext(), musicDB);
+        return new SongsLoader(getContext(), musicDB);
     }
 
     @Override
@@ -116,11 +93,11 @@ public class SongFragment extends Fragment implements LoaderManager.LoaderCallba
     public void onLoaderReset(Loader<Cursor> loader) {
     }
 
-    static class MyCursorLoader extends CursorLoader {
+    static class SongsLoader extends CursorLoader {
 
         MusicDB database;
 
-        public MyCursorLoader(Context context, MusicDB database) {
+        public SongsLoader(Context context, MusicDB database) {
             super(context);
             this.database = database;
         }

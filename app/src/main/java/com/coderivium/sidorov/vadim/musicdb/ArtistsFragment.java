@@ -20,18 +20,11 @@ import com.coderivium.sidorov.vadim.musicdb.data.MusicContract;
 import com.coderivium.sidorov.vadim.musicdb.data.MusicDB;
 
 
-public class ArtistsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class ArtistsFragment extends BaseFragment {
 
-    public static final String LOG_TAG = ArtistsFragment.class.getSimpleName();
-
-    private static final int CM_DELETE_ID = 1;
+    private static final String LOG_TAG = ArtistsFragment.class.getSimpleName();
 
     private ListView artistsList;
-
-    private SimpleCursorAdapter cursorAdapter;
-
-    private MusicDB musicDB;
-
 
     public static ArtistsFragment newInstance() {
         ArtistsFragment fragment = new ArtistsFragment();
@@ -64,7 +57,7 @@ public class ArtistsFragment extends Fragment implements LoaderManager.LoaderCal
         artistsList.setAdapter(cursorAdapter);
 
 
-        getActivity().getSupportLoaderManager().initLoader(2, null, this);
+        getActivity().getSupportLoaderManager().initLoader(Constants.ARTISTS_LOADER_ID, null, this);
         return rootView;
     }
 
@@ -80,31 +73,15 @@ public class ArtistsFragment extends Fragment implements LoaderManager.LoaderCal
         unregisterForContextMenu(artistsList);
     }
 
-    public void onCreateContextMenu(ContextMenu menu, View v,
-                                    ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        menu.add(0, CM_DELETE_ID, 0, R.string.delete_artist);
-    }
+    @Override
+    protected void deleteRecord(long id) {
 
-    public boolean onContextItemSelected(MenuItem item) {
-        if (getUserVisibleHint() && item.getItemId() == CM_DELETE_ID) {
-            AdapterView.AdapterContextMenuInfo acmi = (AdapterView.AdapterContextMenuInfo) item
-                    .getMenuInfo();
-            musicDB.deleteArtist(acmi.id);
+        musicDB.deleteArtist(id);
 
-            // Updating cursors/listviews
-            if (getActivity().getSupportLoaderManager().getLoader(0) != null) {
-                getActivity().getSupportLoaderManager().getLoader(0).forceLoad();
-            }
-            if (getActivity().getSupportLoaderManager().getLoader(1) != null) {
-                getActivity().getSupportLoaderManager().getLoader(1).forceLoad();
-            }
-            if (getActivity().getSupportLoaderManager().getLoader(2) != null) {
-                getActivity().getSupportLoaderManager().getLoader(2).forceLoad();
-            }
-            return true;
-        }
-        return super.onContextItemSelected(item);
+        // Updating loaders/listviews
+        updateLoader(Constants.SONGS_LOADER_ID);
+        updateLoader(Constants.ALBUMS_LOADER_ID);
+        updateLoader(Constants.ARTISTS_LOADER_ID);
     }
 
     @Override
@@ -132,7 +109,6 @@ public class ArtistsFragment extends Fragment implements LoaderManager.LoaderCal
 
         @Override
         public Cursor loadInBackground() {
-
             Cursor cursor = database.getAllArtists();
             return cursor;
         }
