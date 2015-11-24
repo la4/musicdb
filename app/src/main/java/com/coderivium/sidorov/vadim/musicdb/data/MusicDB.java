@@ -68,11 +68,12 @@ public class MusicDB {
 
     public void addSong(String songName, String albumName, String artistName) {
         ContentValues songCV = new ContentValues();
+
         songCV.put(SongEntry.COLUMN_NAME, songName);
 
-        Log.d("", musicDatabase.getPath());
-
         String [] selectionArgs = new String[] { artistName };
+
+        musicDatabase.beginTransaction();
         Cursor artistCursor = musicDatabase.query(ArtistEntry.TABLE_NAME, null, ArtistEntry.COLUMN_NAME + " = ?",  selectionArgs, null, null, null);
         artistCursor.moveToFirst();
 
@@ -81,7 +82,7 @@ public class MusicDB {
 
             // Adding artist
             artistCV.put(ArtistEntry.COLUMN_NAME, artistName);
-            long rowId = musicDatabase.insert(ArtistEntry.TABLE_NAME, null, artistCV);
+            musicDatabase.insert(ArtistEntry.TABLE_NAME, null, artistCV);
             artistCursor = musicDatabase.query(ArtistEntry.TABLE_NAME, null, ArtistEntry.COLUMN_NAME + " = ?",  selectionArgs, null, null, null);
             artistCursor.moveToFirst();
         }
@@ -105,6 +106,9 @@ public class MusicDB {
         songCV.put(SongEntry.COLUMN_ALBUM, albumCursor.getInt(albumCursor.getColumnIndex(AlbumEntry._ID)));
 
         musicDatabase.insert(SongEntry.TABLE_NAME, null, songCV);
+
+        musicDatabase.setTransactionSuccessful();
+        musicDatabase.endTransaction();
     }
 
     public void deleteSong(long id) {
