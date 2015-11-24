@@ -19,18 +19,17 @@ public class MusicDB {
 
     private DBHelper dbHelper;
     private SQLiteDatabase musicDatabase;
-    private static MusicDB mInstance;
-
-    public static MusicDB getInstance() {
-        if (mInstance == null) {
-            mInstance = new MusicDB();
-        }
-
-        return mInstance;
-    }
 
     private MusicDB() {
 
+    }
+
+    private static class SingletonHolder {
+        public static final MusicDB mInstance = new MusicDB();
+    }
+
+    public static MusicDB getInstance() {
+        return SingletonHolder.mInstance;
     }
 
     public void openConnection(Context context) {
