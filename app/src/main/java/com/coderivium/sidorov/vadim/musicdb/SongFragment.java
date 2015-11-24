@@ -42,11 +42,15 @@ public class SongFragment extends BaseFragment {
         musicDB = MusicDB.getInstance();
 
         String[] from = new String[]{
-                MusicContract.SongEntry.COLUMN_NAME
+                MusicContract.SongJoinEntry.COLUMN_SONG_NAME,
+                MusicContract.SongJoinEntry.COLUMN_ALBUM_NAME,
+                MusicContract.SongJoinEntry.COLUMN_ARTIST_NAME,
         };
 
         int[] to = new int[]{
-                R.id.songName
+                R.id.songName,
+                R.id.albumName,
+                R.id.artistName
         };
 
         // Setting adapter

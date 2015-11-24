@@ -32,4 +32,14 @@ public class MusicContract {
 
         public static final String COLUMN_NAME = "name";
     }
+
+    public static class SongJoinEntry implements BaseColumns {
+
+        public static final String COLUMN_SONG_NAME = "jsongname";
+
+        public static final String COLUMN_ALBUM_NAME = "jalbumname";
+
+        public static final String COLUMN_ARTIST_NAME = "jartistname";
+
+    }
 }

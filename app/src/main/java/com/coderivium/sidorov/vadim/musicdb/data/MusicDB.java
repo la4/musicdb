@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.coderivium.sidorov.vadim.musicdb.SQLQueries;
 import com.coderivium.sidorov.vadim.musicdb.data.MusicContract.*;
 
 public class MusicDB {
@@ -15,25 +16,6 @@ public class MusicDB {
 
     private static final String DATABASE_NAME = "musicdb";
     private static final int DATABASE_VERSION = 1;
-
-    private static final String SQL_CREATE_SONGS_TABLE = "CREATE TABLE " + SongEntry.TABLE_NAME + " (" +
-            SongEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-            SongEntry.COLUMN_NAME + " TEXT, " +
-            SongEntry.COLUMN_ALBUM + " TEXT, " +
-            "FOREIGN KEY (" + SongEntry.COLUMN_ALBUM + ") REFERENCES " + AlbumEntry.TABLE_NAME + " (" + AlbumEntry._ID + ") ON DELETE CASCADE" +
-            ");";
-
-    private static final String SQL_CREATE_ALBUMS_TABLE = "CREATE TABLE " + AlbumEntry.TABLE_NAME + " (" +
-            AlbumEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-            AlbumEntry.COLUMN_NAME + " TEXT UNIQUE, " +
-            AlbumEntry.COLUMN_ARTIST + " TEXT, " +
-            "FOREIGN KEY (" + AlbumEntry.COLUMN_ARTIST + ") REFERENCES " + ArtistEntry.TABLE_NAME + " (" + ArtistEntry._ID+ ") ON DELETE CASCADE" +
-            ");";
-
-    private static final String SQL_CREATE_ARTISTS_TABLE = "CREATE TABLE " + ArtistEntry.TABLE_NAME + " (" +
-            ArtistEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-            ArtistEntry.COLUMN_NAME + " TEXT UNIQUE" +
-            ");";
 
     private DBHelper dbHelper;
     private SQLiteDatabase musicDatabase;
@@ -63,7 +45,8 @@ public class MusicDB {
     }
 
     public Cursor getAllSongs() {
-        return musicDatabase.query(SongEntry.TABLE_NAME, null, null, null, null, null, null);
+        Cursor debug = musicDatabase.rawQuery(SQLQueries.SQL_GET_SONGS, null);
+        return debug;
     }
 
     public void addSong(String songName, String albumName, String artistName) {
@@ -141,9 +124,9 @@ public class MusicDB {
 
         @Override
         public void onCreate(SQLiteDatabase db) {
-            db.execSQL(SQL_CREATE_SONGS_TABLE);
-            db.execSQL(SQL_CREATE_ALBUMS_TABLE);
-            db.execSQL(SQL_CREATE_ARTISTS_TABLE);
+            db.execSQL(SQLQueries.SQL_CREATE_SONGS_TABLE);
+            db.execSQL(SQLQueries.SQL_CREATE_ALBUMS_TABLE);
+            db.execSQL(SQLQueries.SQL_CREATE_ARTISTS_TABLE);
         }
 
         @Override
