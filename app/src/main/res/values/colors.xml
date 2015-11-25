@@ -4,4 +4,6 @@
     <color name="colorPrimaryDark">#e64a19</color>
     <color name="colorAccent">#ff5722</color>
     <color name="colorBlack">#000000</color>
+    <color name="navigationBarColor">#ff5722</color>
+    <color name="foreground_material_light">#00ff55</color>
 </resources>

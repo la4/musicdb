@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <ListPreference
+        android:title="@string/pref_dbtype_title"
+        android:key="@string/pref_dbtype_key"
+        android:defaultValue="@string/pref_sqlite_value"
+        android:entryValues="@array/pref_type_values"
+        android:entries="@array/pref_type_entries" />
+</PreferenceScreen>

@@ -21,7 +21,6 @@ public class MusicDB {
     private SQLiteDatabase musicDatabase;
 
     private MusicDB() {
-
     }
 
     private static class SingletonHolder {

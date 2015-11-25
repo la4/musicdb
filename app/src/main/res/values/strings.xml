@@ -2,6 +2,7 @@
     <string name="app_name">MusicDB</string>
     <string name="action_settings">Settings</string>
     <string name="section_format">Hello World from section: %1$d</string>
+
     <string name="delete_song">Delete song</string>
     <string name="delete_album">Delete album</string>
     <string name="delete_artist">Delete artist</string>
@@ -10,7 +11,21 @@
     <string name="add_dialog_title">Add song</string>
     <string name="add_dialog_cancel">Cancel</string>
     <string name="add_dialog_proceed">Add</string>
+
     <string name="add_dialog_song_name">Song name</string>
     <string name="add_dialog_album_name">Album name</string>
     <string name="add_dialog_artist_name">Artist name</string>
+
+    <!-- Strings related to Settings -->
+    <string name="title_activity_settings">Settings</string>
+
+    <string name="pref_dbtype_title">Database type</string>
+    <string name="pref_dbtype_key" translatable="false">type</string>
+
+    <string name="pref_sqlite_label">SQLite</string>
+    <string name="pref_realm_label">realm.io</string>
+
+    <string name="pref_sqlite_value">sqlite</string>
+    <string name="pref_realm_value">realm</string>
+
 </resources>
