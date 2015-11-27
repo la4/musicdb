@@ -5,14 +5,15 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.provider.ContactsContract;
 import android.util.Log;
 
 import com.coderivium.sidorov.vadim.musicdb.SQLQueries;
 import com.coderivium.sidorov.vadim.musicdb.data.MusicContract.*;
 
-public class MusicDB {
+public class SQLiteMusic implements DatabaseMusic {
 
-    private static final String LOG_TAG = MusicDB.class.getSimpleName();
+    private static final String LOG_TAG = SQLiteMusic.class.getSimpleName();
 
     private static final String DATABASE_NAME = "musicdb";
     private static final int DATABASE_VERSION = 1;
@@ -20,33 +21,37 @@ public class MusicDB {
     private DBHelper dbHelper;
     private SQLiteDatabase musicDatabase;
 
-    private MusicDB() {
+    private SQLiteMusic() {
     }
 
     private static class SingletonHolder {
-        public static final MusicDB mInstance = new MusicDB();
+        public static final SQLiteMusic mInstance = new SQLiteMusic();
     }
 
-    public static MusicDB getInstance() {
+    public static SQLiteMusic getInstance() {
         return SingletonHolder.mInstance;
     }
 
+    @Override
     public void openConnection(Context context) {
         dbHelper = new DBHelper(context, DATABASE_NAME, null, DATABASE_VERSION);
         musicDatabase = dbHelper.getWritableDatabase();
     }
 
+    @Override
     public void closeConnection() {
         if (dbHelper != null) {
             dbHelper.close();
         }
     }
 
+    @Override
     public Cursor getAllSongs() {
         Cursor debug = musicDatabase.rawQuery(SQLQueries.SQL_GET_SONGS, null);
         return debug;
     }
 
+    @Override
     public void addSong(String songName, String albumName, String artistName) {
         ContentValues songCV = new ContentValues();
 
@@ -92,23 +97,28 @@ public class MusicDB {
         musicDatabase.endTransaction();
     }
 
+    @Override
     public void deleteSong(long id) {
         String []whereArgs = new String [] { String.valueOf(id) };
         musicDatabase.delete(SongEntry.TABLE_NAME, SongEntry._ID + " = ?", whereArgs);
     }
 
+    @Override
     public Cursor getAllAlbums() {
         return musicDatabase.query(AlbumEntry.TABLE_NAME, null, null, null, null, null, null);
     }
 
+    @Override
     public void deleteAlbum(long id) {
         musicDatabase.delete(AlbumEntry.TABLE_NAME, AlbumEntry._ID + " = " + id, null);
     }
 
+    @Override
     public Cursor getAllArtists() {
         return musicDatabase.query(ArtistEntry.TABLE_NAME, null, null, null, null, null, null);
     }
 
+    @Override
     public void deleteArtist(long id) {
         Log.d(LOG_TAG, musicDatabase.delete(ArtistEntry.TABLE_NAME, ArtistEntry._ID + " = " + id, null) + "");
     }

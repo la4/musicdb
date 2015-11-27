@@ -3,21 +3,17 @@ package com.coderivium.sidorov.vadim.musicdb;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
+import com.coderivium.sidorov.vadim.musicdb.data.DatabaseMusic;
 import com.coderivium.sidorov.vadim.musicdb.data.MusicContract;
-import com.coderivium.sidorov.vadim.musicdb.data.MusicDB;
+import com.coderivium.sidorov.vadim.musicdb.data.SQLiteMusic;
 
 public class SongFragment extends BaseFragment {
 
@@ -39,7 +35,7 @@ public class SongFragment extends BaseFragment {
         View rootView = inflater.inflate(R.layout.fragment_songs, container, false);
 
         // Working with database
-        musicDB = MusicDB.getInstance();
+        database = SQLiteMusic.getInstance();
 
         String[] from = new String[]{
                 MusicContract.SongJoinEntry.COLUMN_SONG_NAME,
@@ -77,7 +73,7 @@ public class SongFragment extends BaseFragment {
 
     @Override
     protected void deleteRecord(long id) {
-        musicDB.deleteSong(id);
+        database.deleteSong(id);
 
         // Updating loaders/listviews
         updateLoader(Constants.SONGS_LOADER_ID);
@@ -85,7 +81,7 @@ public class SongFragment extends BaseFragment {
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
-        return new SongsLoader(getContext(), musicDB);
+        return new SongsLoader(getContext(), database);
     }
 
     @Override
@@ -99,9 +95,9 @@ public class SongFragment extends BaseFragment {
 
     static class SongsLoader extends CursorLoader {
 
-        MusicDB database;
+        DatabaseMusic database;
 
-        public SongsLoader(Context context, MusicDB database) {
+        public SongsLoader(Context context, DatabaseMusic database) {
             super(context);
             this.database = database;
         }

@@ -4,20 +4,17 @@ import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
+import com.coderivium.sidorov.vadim.musicdb.data.DatabaseMusic;
 import com.coderivium.sidorov.vadim.musicdb.data.MusicContract;
-import com.coderivium.sidorov.vadim.musicdb.data.MusicDB;
+import com.coderivium.sidorov.vadim.musicdb.data.SQLiteMusic;
 
 
 /**
@@ -47,7 +44,7 @@ public class AlbumsFragment extends BaseFragment {
         View rootView = inflater.inflate(R.layout.fragment_albums, container, false);
 
         // Working with database
-        musicDB = MusicDB.getInstance();
+        database = SQLiteMusic.getInstance();
 
         String[] from = new String[]{
                 MusicContract.AlbumEntry.COLUMN_NAME
@@ -80,7 +77,7 @@ public class AlbumsFragment extends BaseFragment {
 
     @Override
     protected void deleteRecord(long id) {
-        musicDB.deleteAlbum(id);
+        database.deleteAlbum(id);
 
         // Updating loaders/listviews
         updateLoader(Constants.SONGS_LOADER_ID);
@@ -89,7 +86,7 @@ public class AlbumsFragment extends BaseFragment {
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
-        return new AlbumsCursorLoader(getContext(), musicDB);
+        return new AlbumsCursorLoader(getContext(), database);
     }
 
     @Override
@@ -103,9 +100,9 @@ public class AlbumsFragment extends BaseFragment {
 
     static class AlbumsCursorLoader extends CursorLoader {
 
-        MusicDB database;
+        DatabaseMusic database;
 
-        public AlbumsCursorLoader(Context context, MusicDB database) {
+        public AlbumsCursorLoader(Context context, DatabaseMusic database) {
             super(context);
             this.database = database;
         }

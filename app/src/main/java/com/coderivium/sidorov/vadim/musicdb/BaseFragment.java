@@ -11,13 +11,14 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.SimpleCursorAdapter;
 
-import com.coderivium.sidorov.vadim.musicdb.data.MusicDB;
+import com.coderivium.sidorov.vadim.musicdb.data.DatabaseMusic;
+import com.coderivium.sidorov.vadim.musicdb.data.SQLiteMusic;
 
 public abstract class BaseFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     protected SimpleCursorAdapter cursorAdapter;
 
-    protected MusicDB musicDB;
+    protected DatabaseMusic database;
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v,
