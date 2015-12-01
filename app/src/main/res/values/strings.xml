@@ -1,12 +1,16 @@
 <resources>
     <string name="app_name">MusicDB</string>
+
+    <!-- Strings related to menus -->
     <string name="action_settings">Settings</string>
+    <stromg name="action_benchmark">Benchmark</stromg>
+
     <string name="section_format">Hello World from section: %1$d</string>
 
+    <!-- Strings related to database manipulation -->
     <string name="delete_song">Delete song</string>
     <string name="delete_album">Delete album</string>
     <string name="delete_artist">Delete artist</string>
-
 
     <string name="add_dialog_title">Add song</string>
     <string name="add_dialog_cancel">Cancel</string>
