@@ -24,12 +24,12 @@ public class SQLiteMusic implements DatabaseMusic {
     private SQLiteMusic() {
     }
 
-    private static class SingletonHolder {
-        public static final SQLiteMusic mInstance = new SQLiteMusic();
+    public static DatabaseMusic getInstance() {
+        return SingletonHolder.mInstance;
     }
 
-    public static SQLiteMusic getInstance() {
-        return SingletonHolder.mInstance;
+    private static class SingletonHolder {
+        public static final DatabaseMusic mInstance = new SQLiteMusic();
     }
 
     @Override

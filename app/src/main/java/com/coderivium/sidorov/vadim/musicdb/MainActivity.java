@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
     private SectionsPagerAdapter mSectionsPagerAdapter;
 
-    private DatabaseMusic mSQLiteMusic;
+    private DatabaseMusic mDatabase;
 
     private ViewPager mViewPager;
 
@@ -48,9 +48,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //TODO: here should be implemented polymorphism logic
         // Working with database
-        mSQLiteMusic = SQLiteMusic.getInstance();
-        mSQLiteMusic.openConnection(this);
+        mDatabase = SQLiteMusic.getInstance();
+        mDatabase.openConnection(this);
 
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -83,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
                         .setPositiveButton(R.string.add_dialog_proceed,
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
-                                        mSQLiteMusic.addSong(
+                                        mDatabase.addSong(
                                                 ((EditText) linearLayout.findViewById(R.id.songName)).getText().toString(),
                                                 ((EditText) linearLayout.findViewById(R.id.albumName)).getText().toString(),
                                                 ((EditText) linearLayout.findViewById(R.id.artistName)).getText().toString());
@@ -132,7 +133,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mSQLiteMusic.closeConnection();
+        mDatabase.closeConnection();
     }
 
     /**
