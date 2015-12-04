@@ -1,4 +1,4 @@
-package com.coderivium.sidorov.vadim.musicdb.data;
+package com.coderivium.sidorov.vadim.musicdb.data.sqlite;
 
 import android.provider.BaseColumns;
 import android.renderscript.BaseObj;
@@ -6,7 +6,7 @@ import android.renderscript.BaseObj;
 /*
     Defines our database scheme.
  */
-public class MusicContract {
+public class SQLContract {
 
     public static class SongEntry implements BaseColumns {
 

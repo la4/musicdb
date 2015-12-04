@@ -9,7 +9,7 @@
         android:title="@string/action_settings"
         app:showAsAction="ifRoom" />
 
-    <item android:id="+id/action_benchmark"
+    <item android:id="@+id/action_benchmark"
         android:orderInCategory="1"
         android:title="@string/action_benchmark"
         app:showAsAction="always" />

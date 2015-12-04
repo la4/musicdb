@@ -1,10 +1,11 @@
 package com.coderivium.sidorov.vadim.musicdb.data.realm;
 
+import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
-public class RealmAlbum {
+public class RealmAlbum extends RealmObject{
 
-     @PrimaryKey
+    @PrimaryKey
     private int id;
 
     private String name;

@@ -1,19 +1,26 @@
 package com.coderivium.sidorov.vadim.musicdb;
 
-import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v4.content.CursorLoader;
+import android.preference.PreferenceManager;
 import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
-import com.coderivium.sidorov.vadim.musicdb.data.DatabaseMusic;
-import com.coderivium.sidorov.vadim.musicdb.data.MusicContract;
+import com.coderivium.sidorov.vadim.musicdb.data.sqlite.SQLContract;
+import com.coderivium.sidorov.vadim.musicdb.data.RealmDatabase;
 import com.coderivium.sidorov.vadim.musicdb.data.SQLiteMusic;
+import com.coderivium.sidorov.vadim.musicdb.data.realm.RealmArtist;
+import com.coderivium.sidorov.vadim.musicdb.data.realm.adapters.RealmArtistAdapter;
+import com.coderivium.sidorov.vadim.musicdb.data.sqlite.loaders.ArtistsCursorLoader;
+
+import io.realm.Realm;
+import io.realm.RealmQuery;
+import io.realm.RealmResults;
 
 
 public class ArtistsFragment extends BaseFragment {
@@ -34,40 +41,75 @@ public class ArtistsFragment extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.d(LOG_TAG, "onCreateView");
         View rootView = inflater.inflate(R.layout.fragment_artists, container, false);
 
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(getContext());
+        defaultDatabase = getResources().getString(R.string.pref_default_value);
+        currentDatabase = sharedPref.getString(getString(R.string.pref_dbtype_key), defaultDatabase);
+
         // Working with database
-        database = SQLiteMusic.getInstance();
+        if (currentDatabase.equals(getString(R.string.pref_sqlite_value))) {
+            database = SQLiteMusic.getInstance();
+        } else {
+            database = RealmDatabase.getInstance();
+        }
 
-        String[] from = new String[]{
-                MusicContract.ArtistEntry.COLUMN_NAME
-        };
+        Realm realm = Realm.getInstance(getContext());
+        RealmQuery<RealmArtist> query = realm.where(RealmArtist.class);
+        RealmResults<RealmArtist> results = query.findAll();
 
-        int[] to = new int[]{
-                R.id.artistName
-        };
+        if (currentDatabase.equals(getString(R.string.pref_sqlite_value))) {
+            //Adapter for SQLite database
+            String[] from = new String[]{
+                    SQLContract.ArtistEntry.COLUMN_NAME
+            };
 
-        // Setting adapter
-        cursorAdapter = new SimpleCursorAdapter(getContext(), R.layout.element_list_artist, null, from, to, 0);
+            int[] to = new int[]{
+                    R.id.artistName
+            };
+
+            cursorAdapter = new SimpleCursorAdapter(getContext(), R.layout.element_list_artist, null, from, to, 0);
+        } else {
+            // Adapter for Realm database
+            cursorAdapter = new RealmArtistAdapter(getContext(), R.layout.element_list_artist, results, true);
+        }
+
         artistsList = (ListView) rootView.findViewById(R.id.artistsListView);
         artistsList.setAdapter(cursorAdapter);
 
-
-        getActivity().getSupportLoaderManager().initLoader(Constants.ARTISTS_LOADER_ID, null, this);
+        if (currentDatabase.equals(getString(R.string.pref_sqlite_value))) {
+            getActivity().getSupportLoaderManager().initLoader(Constants.ARTISTS_LOADER_ID, null, this);
+        }
         return rootView;
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        Log.d(LOG_TAG, "onResume");
         registerForContextMenu(artistsList);
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        Log.d(LOG_TAG, "onPause");
         unregisterForContextMenu(artistsList);
     }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        Log.d(LOG_TAG, "onDestroyView");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d(LOG_TAG, "onDestroy");
+    }
+
 
     @Override
     protected void deleteRecord(long id) {
@@ -82,31 +124,19 @@ public class ArtistsFragment extends BaseFragment {
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
-        return new ArtistsCursor(getContext(), database);
+        Log.d(LOG_TAG, "onCreateLoader");
+        return new ArtistsCursorLoader(getContext(), database);
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        cursorAdapter.swapCursor(cursor);
+        Log.d(LOG_TAG, "onLoadFinished");
+        ((SimpleCursorAdapter)cursorAdapter).swapCursor(cursor);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
+        Log.d(LOG_TAG, "onLoaderReset");
     }
 
-    static class ArtistsCursor extends CursorLoader {
-
-        DatabaseMusic database;
-
-        public ArtistsCursor(Context context, DatabaseMusic database) {
-            super(context);
-            this.database = database;
-        }
-
-        @Override
-        public Cursor loadInBackground() {
-            Cursor cursor = database.getAllArtists();
-            return cursor;
-        }
-    }
 }

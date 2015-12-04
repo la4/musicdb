@@ -1,20 +1,27 @@
 package com.coderivium.sidorov.vadim.musicdb;
 
-import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
-import com.coderivium.sidorov.vadim.musicdb.data.DatabaseMusic;
-import com.coderivium.sidorov.vadim.musicdb.data.MusicContract;
+import com.coderivium.sidorov.vadim.musicdb.data.sqlite.SQLContract;
+import com.coderivium.sidorov.vadim.musicdb.data.RealmDatabase;
 import com.coderivium.sidorov.vadim.musicdb.data.SQLiteMusic;
+import com.coderivium.sidorov.vadim.musicdb.data.realm.RealmAlbum;
+import com.coderivium.sidorov.vadim.musicdb.data.realm.adapters.RealmAlbumAdapter;
+import com.coderivium.sidorov.vadim.musicdb.data.sqlite.loaders.AlbumsCursorLoader;
+
+import io.realm.Realm;
+import io.realm.RealmQuery;
+import io.realm.RealmResults;
 
 
 /**
@@ -41,38 +48,73 @@ public class AlbumsFragment extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.d(LOG_TAG, "onCreateView");
         View rootView = inflater.inflate(R.layout.fragment_albums, container, false);
 
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(getContext());
+        defaultDatabase = getResources().getString(R.string.pref_default_value);
+        currentDatabase = sharedPref.getString(getString(R.string.pref_dbtype_key), defaultDatabase);
+
         // Working with database
-        database = SQLiteMusic.getInstance();
+        if (currentDatabase.equals(getString(R.string.pref_sqlite_value))) {
+            database = SQLiteMusic.getInstance();
+        } else {
+            database = RealmDatabase.getInstance();
+        }
 
-        String[] from = new String[]{
-                MusicContract.AlbumEntry.COLUMN_NAME
-        };
+        Realm realm = Realm.getInstance(getContext());
+        RealmQuery<RealmAlbum> query = realm.where(RealmAlbum.class);
+        RealmResults<RealmAlbum> results = query.findAll();
 
-        int[] to = new int[]{
-                R.id.albumName
-        };
+        if (currentDatabase.equals(getString(R.string.pref_sqlite_value))) {
+            //Adapter for SQLite database
+            String[] from = new String[]{
+                    SQLContract.AlbumEntry.COLUMN_NAME
+            };
 
-        // Setting adapter
-        cursorAdapter = new SimpleCursorAdapter(getContext(), R.layout.element_list_album, null, from, to, 0);
+            int[] to = new int[]{
+                    R.id.albumName
+            };
+
+            cursorAdapter = new SimpleCursorAdapter(getContext(), R.layout.element_list_album, null, from, to, 0);
+        } else {
+            // Adapter for Realm database
+            cursorAdapter = new RealmAlbumAdapter(getContext(), R.layout.element_list_album, results, true);
+        }
+
         albumsList = (ListView) rootView.findViewById(R.id.albumsListView);
         albumsList.setAdapter(cursorAdapter);
 
-        getActivity().getSupportLoaderManager().initLoader(Constants.ALBUMS_LOADER_ID, null, this);
+        if (currentDatabase.equals(getString(R.string.pref_sqlite_value))) {
+            getActivity().getSupportLoaderManager().initLoader(Constants.ALBUMS_LOADER_ID, null, this);
+        }
         return rootView;
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        Log.d(LOG_TAG, "onResume");
         registerForContextMenu(albumsList);
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        Log.d(LOG_TAG, "onPause");
         unregisterForContextMenu(albumsList);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        Log.d(LOG_TAG, "onDestroyView");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d(LOG_TAG, "onDestroy");
     }
 
     @Override
@@ -86,32 +128,19 @@ public class AlbumsFragment extends BaseFragment {
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
+        Log.d(LOG_TAG, "onCreateLoader");
         return new AlbumsCursorLoader(getContext(), database);
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        cursorAdapter.swapCursor(cursor);
+        Log.d(LOG_TAG, "onLoadFinished");
+        ((SimpleCursorAdapter)cursorAdapter).swapCursor(cursor);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
+        Log.d(LOG_TAG, "onLoaderReset");
     }
 
-    static class AlbumsCursorLoader extends CursorLoader {
-
-        DatabaseMusic database;
-
-        public AlbumsCursorLoader(Context context, DatabaseMusic database) {
-            super(context);
-            this.database = database;
-        }
-
-        @Override
-        public Cursor loadInBackground() {
-
-            Cursor cursor = database.getAllAlbums();
-            return cursor;
-        }
-    }
 }

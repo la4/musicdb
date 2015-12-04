@@ -2,6 +2,8 @@ package com.coderivium.sidorov.vadim.musicdb;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -20,6 +22,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import com.coderivium.sidorov.vadim.musicdb.data.DatabaseMusic;
+import com.coderivium.sidorov.vadim.musicdb.data.RealmDatabase;
 import com.coderivium.sidorov.vadim.musicdb.data.SQLiteMusic;
 
 public class MainActivity extends AppCompatActivity {
@@ -48,11 +51,18 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //TODO: here should be implemented polymorphism logic
-        // Working with database
-        mDatabase = SQLiteMusic.getInstance();
-        mDatabase.openConnection(this);
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        String defaultDatabase = getResources().getString(R.string.pref_default_value);
+        String currentDatabase = sharedPref.getString(getString(R.string.pref_dbtype_key), defaultDatabase);
 
+        // Working with database
+        if (currentDatabase.equals(getString(R.string.pref_sqlite_value))) {
+            mDatabase = SQLiteMusic.getInstance();
+        } else {
+            mDatabase = RealmDatabase.getInstance();
+        }
+
+        mDatabase.openConnection(this);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -124,6 +134,7 @@ public class MainActivity extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             startActivity(new Intent(this, SettingsActivity.class));
+            finish();
             return true;
         }
 

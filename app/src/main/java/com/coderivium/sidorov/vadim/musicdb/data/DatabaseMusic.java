@@ -9,18 +9,13 @@ public interface DatabaseMusic {
 
     void closeConnection();
 
-    Cursor getAllSongs();
-
     void addSong(String songName, String albumName, String artistName);
 
     void deleteSong(long id);
 
-    Cursor getAllAlbums();
-
     void deleteAlbum(long id);
 
-    Cursor getAllArtists();
-
     void deleteArtist(long id);
+
 }
 

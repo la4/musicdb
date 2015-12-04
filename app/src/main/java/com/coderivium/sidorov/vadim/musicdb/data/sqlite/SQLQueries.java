@@ -1,6 +1,6 @@
-package com.coderivium.sidorov.vadim.musicdb;
+package com.coderivium.sidorov.vadim.musicdb.data.sqlite;
 
-import com.coderivium.sidorov.vadim.musicdb.data.MusicContract.*;
+import com.coderivium.sidorov.vadim.musicdb.data.sqlite.SQLContract.*;
 
 public class SQLQueries {
 

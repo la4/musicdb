@@ -1,5 +1,6 @@
 package com.coderivium.sidorov.vadim.musicdb;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -74,5 +75,12 @@ public class SettingsActivity extends PreferenceActivity
             preference.setSummary(stringValue);
         }
         return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent mainActivity = new Intent(this, MainActivity.class);
+        startActivity(mainActivity);
+        finish();
     }
 }

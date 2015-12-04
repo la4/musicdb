@@ -1,6 +1,8 @@
 package com.coderivium.sidorov.vadim.musicdb;
 
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -9,6 +11,7 @@ import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ListAdapter;
 import android.widget.SimpleCursorAdapter;
 
 import com.coderivium.sidorov.vadim.musicdb.data.DatabaseMusic;
@@ -16,9 +19,13 @@ import com.coderivium.sidorov.vadim.musicdb.data.SQLiteMusic;
 
 public abstract class BaseFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    protected SimpleCursorAdapter cursorAdapter;
+    protected ListAdapter cursorAdapter;
 
     protected DatabaseMusic database;
+
+    protected SharedPreferences sharedPref;
+    protected String defaultDatabase;
+    protected String currentDatabase;
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v,

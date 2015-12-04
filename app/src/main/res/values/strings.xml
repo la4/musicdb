@@ -3,7 +3,7 @@
 
     <!-- Strings related to menus -->
     <string name="action_settings">Settings</string>
-    <stromg name="action_benchmark">Benchmark</stromg>
+    <string name="action_benchmark">Benchmark</string>
 
     <string name="section_format">Hello World from section: %1$d</string>
 
@@ -31,5 +31,8 @@
 
     <string name="pref_sqlite_value">sqlite</string>
     <string name="pref_realm_value">realm</string>
+
+    <string name="pref_default_value">sqlite</string>
+
 
 </resources>

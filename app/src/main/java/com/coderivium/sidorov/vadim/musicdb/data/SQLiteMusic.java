@@ -5,11 +5,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.provider.ContactsContract;
 import android.util.Log;
 
-import com.coderivium.sidorov.vadim.musicdb.SQLQueries;
-import com.coderivium.sidorov.vadim.musicdb.data.MusicContract.*;
+import com.coderivium.sidorov.vadim.musicdb.data.sqlite.SQLQueries;
+import com.coderivium.sidorov.vadim.musicdb.data.sqlite.SQLContract.*;
 
 public class SQLiteMusic implements DatabaseMusic {
 
@@ -43,12 +42,6 @@ public class SQLiteMusic implements DatabaseMusic {
         if (dbHelper != null) {
             dbHelper.close();
         }
-    }
-
-    @Override
-    public Cursor getAllSongs() {
-        Cursor debug = musicDatabase.rawQuery(SQLQueries.SQL_GET_SONGS, null);
-        return debug;
     }
 
     @Override
@@ -104,24 +97,28 @@ public class SQLiteMusic implements DatabaseMusic {
     }
 
     @Override
-    public Cursor getAllAlbums() {
-        return musicDatabase.query(AlbumEntry.TABLE_NAME, null, null, null, null, null, null);
-    }
-
-    @Override
     public void deleteAlbum(long id) {
         musicDatabase.delete(AlbumEntry.TABLE_NAME, AlbumEntry._ID + " = " + id, null);
-    }
-
-    @Override
-    public Cursor getAllArtists() {
-        return musicDatabase.query(ArtistEntry.TABLE_NAME, null, null, null, null, null, null);
     }
 
     @Override
     public void deleteArtist(long id) {
         Log.d(LOG_TAG, musicDatabase.delete(ArtistEntry.TABLE_NAME, ArtistEntry._ID + " = " + id, null) + "");
     }
+
+    public Cursor getAllSongs() {
+        Cursor debug = musicDatabase.rawQuery(SQLQueries.SQL_GET_SONGS, null);
+        return debug;
+    }
+
+    public Cursor getAllAlbums() {
+        return musicDatabase.query(AlbumEntry.TABLE_NAME, null, null, null, null, null, null);
+    }
+
+    public Cursor getAllArtists() {
+        return musicDatabase.query(ArtistEntry.TABLE_NAME, null, null, null, null, null, null);
+    }
+
 
     private class DBHelper extends SQLiteOpenHelper {
 
