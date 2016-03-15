@@ -1,8 +1,9 @@
-package com.coderivium.sidorov.vadim.musicdb;
+package com.coderivium.sidorov.vadim.musicdb.fragments;
 
 import android.database.Cursor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,36 +12,46 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
+import com.coderivium.sidorov.vadim.musicdb.Constants;
+import com.coderivium.sidorov.vadim.musicdb.R;
 import com.coderivium.sidorov.vadim.musicdb.data.sqlite.SQLContract;
 import com.coderivium.sidorov.vadim.musicdb.data.RealmDatabase;
 import com.coderivium.sidorov.vadim.musicdb.data.SQLiteMusic;
-import com.coderivium.sidorov.vadim.musicdb.data.realm.RealmSong;
-import com.coderivium.sidorov.vadim.musicdb.data.realm.adapters.RealmSongAdapter;
-import com.coderivium.sidorov.vadim.musicdb.data.sqlite.loaders.SongsCursorLoader;
+import com.coderivium.sidorov.vadim.musicdb.data.realm.RealmAlbum;
+import com.coderivium.sidorov.vadim.musicdb.data.realm.adapters.RealmAlbumAdapter;
+import com.coderivium.sidorov.vadim.musicdb.data.sqlite.loaders.AlbumsCursorLoader;
 
 import io.realm.Realm;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
 
-public class SongFragment extends BaseFragment {
 
-    private static final String LOG_TAG = SongFragment.class.getSimpleName();
+/**
+ * A simple {@link Fragment} subclass.
+ * Activities that contain this fragment must implement the“‘“
+ * to handle interaction events.
+ * Use the {@link AlbumsFragment#newInstance} factory method to
+ * create an instance of this fragment.
+ */
+public class AlbumsFragment extends BaseFragment {
 
-    private ListView songsList;
+    private static final String LOG_TAG = AlbumsFragment.class.getSimpleName();
 
-    public static SongFragment newInstance() {
-        SongFragment fragment = new SongFragment();
+    private ListView albumsList;
+
+    public static AlbumsFragment newInstance() {
+        AlbumsFragment fragment = new AlbumsFragment();
         return fragment;
     }
 
-    public SongFragment() {
+    public AlbumsFragment() {
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Log.d(LOG_TAG, "onCreateView");
-        View rootView = inflater.inflate(R.layout.fragment_songs, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_albums, container, false);
 
         sharedPref = PreferenceManager.getDefaultSharedPreferences(getContext());
         defaultDatabase = getResources().getString(R.string.pref_default_value);
@@ -53,35 +64,33 @@ public class SongFragment extends BaseFragment {
             database = RealmDatabase.getInstance();
         }
 
-        Realm realm = Realm.getInstance(getContext());
-        RealmQuery<RealmSong> query = realm.where(RealmSong.class);
-        RealmResults<RealmSong> results = query.findAll();
+
 
         if (currentDatabase.equals(getString(R.string.pref_sqlite_value))) {
             //Adapter for SQLite database
             String[] from = new String[]{
-                    SQLContract.SongJoinEntry.COLUMN_SONG_NAME,
-                    SQLContract.SongJoinEntry.COLUMN_ALBUM_NAME,
-                    SQLContract.SongJoinEntry.COLUMN_ARTIST_NAME,
+                    SQLContract.AlbumEntry.COLUMN_NAME
             };
 
             int[] to = new int[]{
-                    R.id.songName,
-                    R.id.albumName,
-                    R.id.artistName
+                    R.id.albumName
             };
 
-            cursorAdapter = new SimpleCursorAdapter(getContext(), R.layout.element_list_song, null, from, to, 0);
+            cursorAdapter = new SimpleCursorAdapter(getContext(), R.layout.element_list_album, null, from, to, 0);
         } else {
+            Realm realm = Realm.getInstance(getContext());
+            RealmQuery<RealmAlbum> query = realm.where(RealmAlbum.class);
+            RealmResults<RealmAlbum> results = query.findAll();
+
             // Adapter for Realm database
-            cursorAdapter = new RealmSongAdapter(getContext(), R.layout.element_list_song, results, true);
+            cursorAdapter = new RealmAlbumAdapter(getContext(), R.layout.element_list_album, results, true);
         }
 
-        songsList = (ListView) rootView.findViewById(R.id.songsListView);
-        songsList.setAdapter(cursorAdapter);
+        albumsList = (ListView) rootView.findViewById(R.id.albumsListView);
+        albumsList.setAdapter(cursorAdapter);
 
         if (currentDatabase.equals(getString(R.string.pref_sqlite_value))) {
-            getActivity().getSupportLoaderManager().initLoader(Constants.SONGS_LOADER_ID, null, this);
+            getActivity().getSupportLoaderManager().initLoader(Constants.ALBUMS_LOADER_ID, null, this);
         }
         return rootView;
     }
@@ -90,14 +99,14 @@ public class SongFragment extends BaseFragment {
     public void onResume() {
         super.onResume();
         Log.d(LOG_TAG, "onResume");
-        registerForContextMenu(songsList);
+        registerForContextMenu(albumsList);
     }
 
     @Override
     public void onPause() {
         super.onPause();
         Log.d(LOG_TAG, "onPause");
-        unregisterForContextMenu(songsList);
+        unregisterForContextMenu(albumsList);
     }
 
     @Override
@@ -114,16 +123,17 @@ public class SongFragment extends BaseFragment {
 
     @Override
     protected void deleteRecord(long id) {
-        database.deleteSong(id);
+        database.deleteAlbum(id);
 
         // Updating loaders/listviews
         updateLoader(Constants.SONGS_LOADER_ID);
+        updateLoader(Constants.ALBUMS_LOADER_ID);
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
         Log.d(LOG_TAG, "onCreateLoader");
-        return new SongsCursorLoader(getContext(), database);
+        return new AlbumsCursorLoader(getContext(), database);
     }
 
     @Override
@@ -136,4 +146,5 @@ public class SongFragment extends BaseFragment {
     public void onLoaderReset(Loader<Cursor> loader) {
         Log.d(LOG_TAG, "onLoaderReset");
     }
+
 }

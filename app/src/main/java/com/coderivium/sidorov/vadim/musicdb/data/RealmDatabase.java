@@ -41,11 +41,12 @@ public class RealmDatabase implements DatabaseMusic {
     public void addSong(String songName, String albumName, String artistName) {
         Log.d(LOG_TAG, "add song");
 
-
         RealmSong song = new RealmSong();
         song.setName(songName);
 
-        RealmQuery<RealmArtist> artistQuery = realm
+        //song.setId(getNextSongId());
+
+        /*RealmQuery<RealmArtist> artistQuery = realm
                 .where(RealmArtist.class)
                 .equalTo("name", artistName);
 
@@ -61,21 +62,17 @@ public class RealmDatabase implements DatabaseMusic {
             realm.commitTransaction();
 
             artist = artistQuery.findAll(); //do i need this ?? debug
-        }
+        }*/
 
-        RealmQuery<RealmAlbum> albumQuery = realm
-                .where(RealmAlbum.class)
-                .equalTo("name", albumName)
-                .equalTo(, artist.iterator().next())
-
-
+        realm.beginTransaction();
         realm.copyToRealm(song);
-
         realm.commitTransaction();
     }
 
     public void deleteSong(long id) {
         Log.d(LOG_TAG, "deleteSong");
+
+       // RealmResults<RealmSong> result = realm.where(RealmSong.class).equalTo();
     }
 
     public void deleteAlbum(long id) {
@@ -88,6 +85,6 @@ public class RealmDatabase implements DatabaseMusic {
     }
 
     public int getNextSongId() {
-        return (int)realm.where(RealmSong.class).maximumInt("id_cp") + 1;
+        return (int)realm.where(RealmSong.class).maximumInt("id") + 1;
     }
 }

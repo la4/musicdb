@@ -24,6 +24,9 @@ import android.widget.LinearLayout;
 import com.coderivium.sidorov.vadim.musicdb.data.DatabaseMusic;
 import com.coderivium.sidorov.vadim.musicdb.data.RealmDatabase;
 import com.coderivium.sidorov.vadim.musicdb.data.SQLiteMusic;
+import com.coderivium.sidorov.vadim.musicdb.fragments.AlbumsFragment;
+import com.coderivium.sidorov.vadim.musicdb.fragments.ArtistsFragment;
+import com.coderivium.sidorov.vadim.musicdb.fragments.SongFragment;
 
 public class MainActivity extends AppCompatActivity {
 

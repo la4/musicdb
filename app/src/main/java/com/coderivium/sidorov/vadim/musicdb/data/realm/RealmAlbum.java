@@ -1,5 +1,6 @@
 package com.coderivium.sidorov.vadim.musicdb.data.realm;
 
+import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
@@ -10,7 +11,7 @@ public class RealmAlbum extends RealmObject{
 
     private String name;
 
-    private RealmArtist artist;
+    private RealmList<RealmSong> songs;
 
     // Standard getters and setters that will later be overridden by proxy classes
     public int getId() {
@@ -29,11 +30,13 @@ public class RealmAlbum extends RealmObject{
         this.name = name;
     }
 
-    public RealmArtist getArtist() {
-        return artist;
+
+    public RealmList<RealmSong> getSongs() {
+        return songs;
     }
 
-    public void setArtist(RealmArtist artist) {
-        this.artist = artist;
+    public void setSongs(RealmList<RealmSong> songs) {
+        this.songs = songs;
     }
+
 }

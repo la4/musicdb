@@ -1,4 +1,4 @@
-package com.coderivium.sidorov.vadim.musicdb;
+package com.coderivium.sidorov.vadim.musicdb.fragments;
 
 import android.database.Cursor;
 import android.os.Bundle;
@@ -11,6 +11,8 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
+import com.coderivium.sidorov.vadim.musicdb.Constants;
+import com.coderivium.sidorov.vadim.musicdb.R;
 import com.coderivium.sidorov.vadim.musicdb.data.sqlite.SQLContract;
 import com.coderivium.sidorov.vadim.musicdb.data.RealmDatabase;
 import com.coderivium.sidorov.vadim.musicdb.data.SQLiteMusic;
@@ -55,10 +57,6 @@ public class ArtistsFragment extends BaseFragment {
             database = RealmDatabase.getInstance();
         }
 
-        Realm realm = Realm.getInstance(getContext());
-        RealmQuery<RealmArtist> query = realm.where(RealmArtist.class);
-        RealmResults<RealmArtist> results = query.findAll();
-
         if (currentDatabase.equals(getString(R.string.pref_sqlite_value))) {
             //Adapter for SQLite database
             String[] from = new String[]{
@@ -71,6 +69,10 @@ public class ArtistsFragment extends BaseFragment {
 
             cursorAdapter = new SimpleCursorAdapter(getContext(), R.layout.element_list_artist, null, from, to, 0);
         } else {
+            Realm realm = Realm.getInstance(getContext());
+            RealmQuery<RealmArtist> query = realm.where(RealmArtist.class);
+            RealmResults<RealmArtist> results = query.findAll();
+
             // Adapter for Realm database
             cursorAdapter = new RealmArtistAdapter(getContext(), R.layout.element_list_artist, results, true);
         }

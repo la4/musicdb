@@ -1,4 +1,4 @@
-package com.coderivium.sidorov.vadim.musicdb;
+package com.coderivium.sidorov.vadim.musicdb.fragments;
 
 
 import android.content.Context;
@@ -14,6 +14,8 @@ import android.widget.AdapterView;
 import android.widget.ListAdapter;
 import android.widget.SimpleCursorAdapter;
 
+import com.coderivium.sidorov.vadim.musicdb.Constants;
+import com.coderivium.sidorov.vadim.musicdb.R;
 import com.coderivium.sidorov.vadim.musicdb.data.DatabaseMusic;
 import com.coderivium.sidorov.vadim.musicdb.data.SQLiteMusic;
 
